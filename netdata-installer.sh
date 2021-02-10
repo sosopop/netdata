@@ -543,13 +543,13 @@ build_libmosquitto() {
   else
     pushd ${1} > /dev/null || return 1
     if [ "$(uname)" = "Darwin" ] && [ -d /usr/local/opt/openssl ]; then
-      run ${env_cmd} cmake \
+      run ${env_cmd} cmake -DCMAKE_TOOLCHAIN_FILE=/mnt/d/code/polly/android-ndk-r10e-api-21-armeabi-v7a-neon.cmake -DCMAKE_BUILD_TYPE=Release \
         -D OPENSSL_ROOT_DIR=/usr/local/opt/openssl \
         -D OPENSSL_LIBRARIES=/usr/local/opt/openssl/lib \
         -D WITH_STATIC_LIBRARIES:boolean=YES \
         .
     else
-      run ${env_cmd} cmake -D WITH_STATIC_LIBRARIES:boolean=YES .
+      run ${env_cmd} cmake -DCMAKE_TOOLCHAIN_FILE=/mnt/d/code/polly/android-ndk-r10e-api-21-armeabi-v7a-neon.cmake -DCMAKE_BUILD_TYPE=Release -D WITH_STATIC_LIBRARIES:boolean=YES .
     fi
     run ${env_cmd} make -C lib
     run mv lib/libmosquitto_static.a lib/libmosquitto.a
@@ -644,11 +644,11 @@ EOF
     run ${env_cmd} cmake \
       -D OPENSSL_ROOT_DIR=/usr/local/opt/openssl \
       -D OPENSSL_LIBRARIES=/usr/local/opt/openssl/lib \
-      -D LWS_WITH_SOCKS5:bool=ON \
+      -D LWS_WITH_SOCKS5:bool=ON -DCMAKE_TOOLCHAIN_FILE=/mnt/d/code/polly/android-ndk-r10e-api-21-armeabi-v7a-neon.cmake -DCMAKE_BUILD_TYPE=Release \
       $CMAKE_FLAGS \
       .
   else
-    run ${env_cmd} cmake -D LWS_WITH_SOCKS5:bool=ON $CMAKE_FLAGS .
+    run ${env_cmd} cmake -D LWS_WITH_SOCKS5:bool=ON -DCMAKE_TOOLCHAIN_FILE=/mnt/d/code/polly/android-ndk-r10e-api-21-armeabi-v7a-neon.cmake -DCMAKE_BUILD_TYPE=Release $CMAKE_FLAGS .
   fi
   run ${env_cmd} make
   popd > /dev/null || exit 1
@@ -810,7 +810,7 @@ build_jsonc() {
   fi
 
   pushd "${1}" > /dev/null || exit 1
-  run ${env_cmd} cmake -DBUILD_SHARED_LIBS=OFF .
+  run ${env_cmd} cmake -DBUILD_SHARED_LIBS=OFF -DCMAKE_TOOLCHAIN_FILE=/mnt/d/code/polly/android-ndk-r10e-api-21-armeabi-v7a-neon.cmake -DCMAKE_BUILD_TYPE=Release .
   run ${env_cmd} make
   popd > /dev/null || exit 1
 }
@@ -971,6 +971,7 @@ run ./configure \
   --localstatedir="${NETDATA_PREFIX}/var" \
   --libexecdir="${NETDATA_PREFIX}/usr/libexec" \
   --libdir="${NETDATA_PREFIX}/usr/lib" \
+  --host="arm-linux" \
   --with-zlib \
   --with-math \
   --with-user=netdata \
@@ -988,7 +989,7 @@ run $make clean
 # -----------------------------------------------------------------------------
 progress "Compile netdata"
 
-run $make -j$(find_processors) || exit 1
+run $make -j1 VERBOSE=1 || exit 1
 
 # -----------------------------------------------------------------------------
 progress "Migrate configuration files for node.d.plugin and charts.d.plugin"
