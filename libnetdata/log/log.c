@@ -757,7 +757,7 @@ static const char *strerror_result_string(const char *a, const char *b) { (void)
 
 void error_int( const char *prefix, const char *file, const char *function, const unsigned long line, const char *fmt, ... ) {
     // save a copy of errno - just in case this function generates a new error
-    int __errno = errno;
+    int ___errno = errno;
 
     va_list args;
 
@@ -781,9 +781,9 @@ void error_int( const char *prefix, const char *file, const char *function, cons
     vfprintf( stderr, fmt, args );
     va_end( args );
 
-    if(__errno) {
+    if(___errno) {
         char buf[1024];
-        fprintf(stderr, " (errno %d, %s)\n", __errno, strerror_result(strerror_r(__errno, buf, 1023), buf));
+        fprintf(stderr, " (errno %d, %s)\n", ___errno, strerror_result(strerror_r(___errno, buf, 1023), buf));
         errno = 0;
     }
     else
@@ -794,7 +794,7 @@ void error_int( const char *prefix, const char *file, const char *function, cons
 
 void fatal_int( const char *file, const char *function, const unsigned long line, const char *fmt, ... ) {
     // save a copy of errno - just in case this function generates a new error
-    int __errno = errno;
+    int ___errno = errno;
     va_list args;
     const char *thread_tag;
     char os_threadname[NETDATA_THREAD_NAME_MAX + 1];
@@ -830,7 +830,7 @@ void fatal_int( const char *file, const char *function, const unsigned long line
     log_unlock();
 
     char action_data[70+1];
-    snprintfz(action_data, 70, "%04lu@%-10.10s:%-15.15s/%d", line, file, function, __errno);
+    snprintfz(action_data, 70, "%04lu@%-10.10s:%-15.15s/%d", line, file, function, ___errno);
     char action_result[60+1];
 
     snprintfz(action_result, 60, "%s:%s", program_name, strncmp(thread_tag, "STREAM_RECEIVER", strlen("STREAM_RECEIVER")) ? thread_tag : "[x]");

@@ -989,7 +989,7 @@ run $make clean
 # -----------------------------------------------------------------------------
 progress "Compile netdata"
 
-run $make -j1 VERBOSE=1 || exit 1
+run $make -j1 || exit 1
 
 # -----------------------------------------------------------------------------
 progress "Migrate configuration files for node.d.plugin and charts.d.plugin"
